@@ -128,7 +128,13 @@
 				</div>
 			{/if}
 
-			<div class="space-y-4">
+			<form
+				onsubmit={(e) => {
+					e.preventDefault();
+					handleLogin();
+				}}
+				class="space-y-4"
+			>
 				<div>
 					<label class="block text-xs font-semibold text-gray-500 mb-1">Username Admin</label>
 					<input
@@ -148,12 +154,12 @@
 					/>
 				</div>
 				<button
-					onclick={handleLogin}
+					type="submit"
 					class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl text-sm font-bold transition-all shadow-sm"
 				>
 					MASUK KE SISTEM
 				</button>
-			</div>
+			</form>
 		</div>
 	</div>
 {:else}
