@@ -234,7 +234,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+			<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
 				{#if activeTab === 'buku'}
 					<div class="xl:col-span-2 space-y-6">
 						<div class="bg-white p-6 rounded-xl border shadow-sm">
@@ -372,258 +372,280 @@
 						</div>
 					</div>
 				{:else if activeTab === 'pinjam'}
-					<div class="xl:col-span-2 space-y-6">
-						<div class="bg-white p-6 rounded-xl border shadow-sm">
-							<h3 class="text-lg font-bold mb-4 text-gray-800">Daftar Peminjam Aktif</h3>
-							<table class="w-full text-left text-xs whitespace-nowrap">
-								<thead>
-									<tr class="bg-gray-50 border-b text-gray-600 font-semibold">
-										<th class="p-3">ID Log</th>
-										<th class="p-3">No. Anggota</th>
-										<th class="p-3">Nama</th>
-										<th class="p-3">Kode Buku</th>
-										<th class="p-3">Judul Buku</th>
-										<th class="p-3">Tgl Pinjam</th>
-										<th class="p-3">Tgl Kembali</th>
-										<th class="p-3 text-center">Status</th>
-										<th class="p-3 text-center">Aksi</th>
-									</tr>
-								</thead>
-								<tbody class="divide-y text-gray-600">
-									{#each riwayatTransaksi as trx}
-										{@const statusSekarang = cekStatusOtomatis(trx.tanggal_kembali, trx.status)}
-										<tr class="hover:bg-gray-50">
-											<td class="p-3 font-mono text-gray-400">{trx.id}</td>
-											<td class="p-3 font-mono font-bold text-gray-700">{trx.no_anggota}</td>
-											<td class="p-3 font-medium text-gray-900">{trx.nama_peminjam}</td>
-											<td class="p-3 font-mono text-blue-600 font-bold">{trx.kode_buku}</td>
-											<td class="p-3">{trx.judul_buku}</td>
-											<td class="p-3 font-mono">{trx.tanggal_pinjam}</td>
-											<td class="p-3 font-mono">{trx.tanggal_kembali}</td>
-											<td class="p-3 text-center">
-												<span
-													class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
-                                                    {statusSekarang === 'Kembali'
-														? 'bg-green-100 text-green-700'
-														: ''}
-                                                    {statusSekarang === 'Dipinjam'
-														? 'bg-blue-100 text-blue-700'
-														: ''}
-                                                    {statusSekarang === 'Terlambat'
-														? 'bg-red-100 text-red-700 animate-pulse'
-														: ''}
-                                                "
-												>
-													{statusSekarang}
-												</span>
-											</td>
-											<td class="p-3 text-center">
-												{#if statusSekarang !== 'Kembali'}
-													<form method="POST" action="?/kembalikanBuku" use:enhance>
-														<input type="hidden" name="trxId" value={trx.id} />
-														<button
-															type="submit"
-															class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded shadow-sm font-semibold transition-colors"
-															>Kembalikan</button
+					<div class="flex flex-col lg:flex-row gap-6 items-start w-full xl:col-span-3">
+						<div class="w-full lg:w-2/3 space-y-6 flex-shrink-0">
+							<div class="bg-white p-6 rounded-xl border shadow-sm w-full">
+								<h3 class="text-lg font-bold mb-4 text-gray-800">Daftar Peminjam Aktif</h3>
+
+								<div class="w-full overflow-x-auto">
+									<table class="w-full text-left text-xs whitespace-nowrap">
+										<thead>
+											<tr class="bg-gray-50 border-b text-gray-600 font-semibold">
+												<th class="p-3">ID Log</th>
+												<th class="p-3">No. Anggota</th>
+												<th class="p-3">Nama</th>
+												<th class="p-3">Kode Buku</th>
+												<th class="p-3">Judul Buku</th>
+												<th class="p-3">Tgl Pinjam</th>
+												<th class="p-3">Tgl Kembali</th>
+												<th class="p-3 text-center">Status</th>
+												<th class="p-3 text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody class="divide-y text-gray-600">
+											{#each riwayatTransaksi as trx}
+												{@const statusSekarang = cekStatusOtomatis(trx.tanggal_kembali, trx.status)}
+												<tr class="hover:bg-gray-50">
+													<td class="p-3 font-mono text-gray-400">{trx.id}</td>
+													<td class="p-3 font-mono font-bold text-gray-700">{trx.no_anggota}</td>
+													<td class="p-3 font-medium text-gray-900">{trx.nama_peminjam}</td>
+													<td class="p-3 font-mono text-blue-600 font-bold">{trx.kode_buku}</td>
+													<td class="p-3">{trx.judul_buku}</td>
+													<td class="p-3 font-mono">{trx.tanggal_pinjam}</td>
+													<td class="p-3 font-mono">{trx.tanggal_kembali}</td>
+													<td class="p-3 text-center">
+														<span
+															class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
+                                                            {statusSekarang === 'Kembali'
+																? 'bg-green-100 text-green-700'
+																: ''}
+                                                            {statusSekarang === 'Dipinjam'
+																? 'bg-blue-100 text-blue-700'
+																: ''}
+                                                            {statusSekarang === 'Terlambat'
+																? 'bg-red-100 text-red-700 animate-pulse'
+																: ''}"
 														>
-													</form>
-												{:else}
-													<span class="text-gray-400 font-mono">-</span>
-												{/if}
-											</td>
-										</tr>
-									{/each}
-								</tbody>
-							</table>
+															{statusSekarang}
+														</span>
+													</td>
+													<td class="p-3 text-center">
+														{#if statusSekarang !== 'Kembali'}
+															<form method="POST" action="?/kembalikanBuku" use:enhance>
+																<input type="hidden" name="trxId" value={trx.id} />
+																<button
+																	type="submit"
+																	class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded shadow-sm font-semibold transition-colors"
+																>
+																	Kembalikan
+																</button>
+															</form>
+														{:else}
+															<span class="text-gray-400 font-mono">-</span>
+														{/if}
+													</td>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</div>
+							</div>
 						</div>
-					</div>
 
-					<div class="bg-white p-5 rounded-xl border shadow-sm h-fit">
-						<h4 class="font-bold text-gray-800 border-b pb-2 mb-4">Tambah Peminjam</h4>
-						<form method="POST" action="?/eksekusiPeminjaman" use:enhance class="space-y-4">
-							<div>
-								<label class="block text-xs font-semibold text-gray-500 mb-1"
-									>No Anggota Peminjam</label
-								>
-								<select
-									name="noAnggota"
-									required
-									class="w-full p-2 border rounded-lg text-sm bg-white outline-none"
-								>
-									{#each daftarAnggota as ang}
-										<option value={ang.no_anggota}>{ang.no_anggota} - {ang.nama_lengkap}</option>
-									{/each}
-								</select>
-							</div>
-							<div>
-								<label class="block text-xs font-semibold text-gray-500 mb-1"
-									>Pilih Buku Berdasarkan Kode</label
-								>
-								<select
-									name="kodeBuku"
-									required
-									class="w-full p-2 border rounded-lg text-sm bg-white outline-none"
-								>
-									{#each daftarBuku as b}
-										<option value={b.id} disabled={b.stok === 0}
-											>{b.id} - {b.judul} ({b.stok > 0 ? `Stok: ${b.stok}` : 'Habis'})</option
-										>
-									{/each}
-								</select>
-							</div>
-							<div>
-								<label class="block text-xs font-semibold text-gray-500 mb-1"
-									>Durasi Pinjam (Hari)</label
-								>
-								<input
-									type="number"
-									name="lamaPinjam"
-									min="1"
-									value="7"
-									class="w-full p-2 border rounded-lg text-sm outline-none"
-								/>
-							</div>
-							<button
-								type="submit"
-								class="w-full bg-blue-600 text-white p-2.5 rounded-lg text-xs font-bold shadow-sm hover:bg-blue-700"
-								>SIMPAN TRANSAKSI PINJAM</button
-							>
-						</form>
-					</div>
-				{:else if activeTab === 'anggota'}
-					<div class="xl:col-span-2 space-y-6">
-						<div class="bg-white p-6 rounded-xl border shadow-sm">
-							<h3 class="text-lg font-bold mb-4 text-gray-800">Daftar Anggota Perpustakaan</h3>
-							<table class="w-full text-left text-sm">
-								<thead>
-									<tr class="bg-gray-50 border-b text-gray-600 font-semibold">
-										<th class="p-3">No Anggota</th>
-										<th class="p-3">Nama Lengkap</th>
-										<th class="p-3">Kelas</th>
-										<th class="p-3">No. HP</th>
-										<th class="p-3 text-center">Aksi</th>
-									</tr>
-								</thead>
-								<tbody class="divide-y text-gray-600">
-									{#each daftarAnggota as ang}
-										<tr class="hover:bg-gray-50">
-											<td class="p-3 font-mono font-bold text-gray-800">{ang.no_anggota}</td>
-											<td class="p-3 font-semibold text-gray-900">{ang.nama_lengkap}</td>
-											<td class="p-3">{ang.kelas}</td>
-											<td class="p-3 font-mono">{ang.no_hp || '-'}</td>
-											<td class="p-3 text-center whitespace-nowrap">
-												<button
-													onclick={() => pemicuEditAnggota(ang)}
-													class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded transition-colors mr-1"
-													>Edit</button
-												>
-
-												<form method="POST" action="?/hapusAnggota" use:enhance class="inline">
-													<input type="hidden" name="noAnggota" value={ang.no_anggota} />
-													<button
-														type="submit"
-														onclick={(e) => {
-															if (!confirm('Apakah Anda yakin ingin menghapus anggota ini?'))
-																e.preventDefault();
-														}}
-														class="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
-													>
-														Hapus
-													</button>
-												</form>
-											</td>
-										</tr>
-									{/each}
-								</tbody>
-							</table>
-						</div>
-					</div>
-
-					<div class="bg-white p-5 rounded-xl border shadow-sm h-fit">
-						<h4 class="font-bold text-gray-800 border-b pb-2 mb-3">
-							{isEditingAnggota ? '📝 Edit Anggota' : '➕ Registrasi Anggota'}
-						</h4>
-						<form
-							method="POST"
-							action="?/simpanAnggota"
-							use:enhance
-							class="space-y-3"
-							onsubmit={() => (isEditingAnggota = false)}
+						<div
+							class="bg-white p-5 rounded-xl border shadow-sm h-fit w-full lg:w-1/3 min-w-[320px]"
 						>
-							<input type="hidden" name="isEdit" value={isEditingAnggota ? 'true' : 'false'} />
-							<div>
-								<label class="block text-xs font-semibold text-gray-500 mb-1"
-									>No. Anggota (Isi Manual)</label
-								>
-								<input
-									type="text"
-									name="noAnggota"
-									required
-									bind:value={editNoAnggota}
-									readonly={isEditingAnggota}
-									placeholder="Contoh: 2026001, NIS-88"
-									class="w-full p-2 border rounded-lg text-sm outline-none font-mono disabled:bg-gray-100 readonly:bg-gray-100 readonly:text-gray-400"
-								/>
-							</div>
-							<div>
-								<label class="block text-xs font-semibold text-gray-500 mb-1">Nama Lengkap</label>
-								<input
-									type="text"
-									name="namaLengkap"
-									required
-									bind:value={editNamaLengkap}
-									placeholder="Nama Lengkap"
-									class="w-full p-2 border rounded-lg text-sm outline-none"
-								/>
-							</div>
-							<div>
-								<label class="block text-xs font-semibold text-gray-500 mb-1">Kelas</label>
-								<input
-									type="text"
-									name="kelas"
-									required
-									bind:value={editKelas}
-									placeholder="Contoh: IF-3"
-									class="w-full p-2 border rounded-lg text-sm outline-none"
-								/>
-							</div>
-							<div>
-								<label class="block text-xs font-semibold text-gray-500 mb-1">No HP/WA</label>
-								<input
-									type="text"
-									name="noHp"
-									bind:value={editNoHp}
-									placeholder="08xxxxxxxx"
-									class="w-full p-2 border rounded-lg text-sm outline-none"
-								/>
-							</div>
-							<div>
-								<label class="block text-xs font-semibold text-gray-500 mb-1">Alamat</label>
-								<textarea
-									name="alamat"
-									bind:value={editAlamat}
-									placeholder="Alamat lengkap"
-									rows="2"
-									class="w-full p-2 border rounded-lg text-sm outline-none resize-none"
-								></textarea>
-							</div>
-							<div class="flex gap-2 pt-2">
-								{#if isEditingAnggota}
-									<button
-										type="button"
-										onclick={batalkanEditAnggota}
-										class="flex-1 bg-gray-200 text-gray-700 p-2 rounded-lg text-xs font-bold hover:bg-gray-300"
-										>Batal</button
+							<h4 class="font-bold text-gray-800 border-b pb-2 mb-4">Tambah Peminjam</h4>
+							<form method="POST" action="?/eksekusiPeminjaman" use:enhance class="space-y-4">
+								<div>
+									<label class="block text-xs font-semibold text-gray-500 mb-1"
+										>No Anggota Peminjam</label
 									>
-								{/if}
+									<select
+										name="noAnggota"
+										required
+										class="w-full p-2 border rounded-lg text-sm bg-white outline-none"
+									>
+										{#each daftarAnggota as ang}
+											<option value={ang.no_anggota}>{ang.no_anggota} - {ang.nama_lengkap}</option>
+										{/each}
+									</select>
+								</div>
+								<div>
+									<label class="block text-xs font-semibold text-gray-500 mb-1"
+										>Pilih Buku Berdasarkan Kode</label
+									>
+									<select
+										name="kodeBuku"
+										required
+										class="w-full p-2 border rounded-lg text-sm bg-white outline-none"
+									>
+										{#each daftarBuku as b}
+											<option value={b.id} disabled={b.stok === 0}>
+												{b.id} - {b.judul} ({b.stok > 0 ? `Stok: ${b.stok}` : 'Habis'})
+											</option>
+										{/each}
+									</select>
+								</div>
+								<div>
+									<label class="block text-xs font-semibold text-gray-500 mb-1"
+										>Durasi Pinjam (Hari)</label
+									>
+									<input
+										type="number"
+										name="lamaPinjam"
+										min="1"
+										value="7"
+										class="w-full p-2 border rounded-lg text-sm outline-none"
+									/>
+								</div>
 								<button
 									type="submit"
-									class="flex-1 bg-blue-600 text-white p-2 rounded-lg text-xs font-bold hover:bg-blue-700"
+									class="w-full bg-blue-600 text-white p-2.5 rounded-lg text-xs font-bold shadow-sm hover:bg-blue-700"
 								>
-									{isEditingAnggota ? 'PERBARUI DATA' : 'REGISTRASI'}
+									SIMPAN TRANSAKSI PINJAM
 								</button>
+							</form>
+						</div>
+					</div>
+				{:else if activeTab === 'anggota'}
+					<div class="flex flex-col lg:flex-row gap-6 items-start w-full xl:col-span-3">
+						<div class="w-full lg:w-2/3 space-y-6 flex-shrink-0">
+							<div class="bg-white p-6 rounded-xl border shadow-sm w-full">
+								<h3 class="text-lg font-bold mb-4 text-gray-800">Daftar Anggota Perpustakaan</h3>
+
+								<div class="w-full overflow-x-auto">
+									<table class="w-full text-left text-sm whitespace-nowrap">
+										<thead>
+											<tr class="bg-gray-50 border-b text-gray-600 font-semibold">
+												<th class="p-3">No Anggota</th>
+												<th class="p-3">Nama Lengkap</th>
+												<th class="p-3">Kelas</th>
+												<th class="p-3">No. HP</th>
+												<th class="p-3">Alamat</th> <th class="p-3 text-center">Aksi</th>
+											</tr>
+										</thead>
+										<tbody class="divide-y text-gray-600">
+											{#each daftarAnggota as ang}
+												<tr class="hover:bg-gray-50">
+													<td class="p-3 font-mono font-bold text-gray-800">{ang.no_anggota}</td>
+													<td class="p-3 font-semibold text-gray-900">{ang.nama_lengkap}</td>
+													<td class="p-3">{ang.kelas}</td>
+													<td class="p-3 font-mono">{ang.no_hp || '-'}</td>
+													<td
+														class="p-3 max-w-xs whitespace-normal break-words text-gray-500 text-xs leading-relaxed"
+														>{ang.alamat || '-'}</td
+													>
+													<td class="p-3 text-center whitespace-nowrap">
+														<button
+															onclick={() => pemicuEditAnggota(ang)}
+															class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded transition-colors mr-1"
+															>Edit</button
+														>
+
+														<form method="POST" action="?/hapusAnggota" use:enhance class="inline">
+															<input type="hidden" name="noAnggota" value={ang.no_anggota} />
+															<button
+																type="submit"
+																onclick={(e) => {
+																	if (!confirm('Apakah Anda yakin ingin menghapus anggota ini?'))
+																		e.preventDefault();
+																}}
+																class="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+															>
+																Hapus
+															</button>
+														</form>
+													</td>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</div>
 							</div>
-						</form>
+						</div>
+
+						<div
+							class="bg-white p-5 rounded-xl border shadow-sm h-fit w-full lg:w-1/3 min-w-[320px]"
+						>
+							<h4 class="font-bold text-gray-800 border-b pb-2 mb-3">
+								{isEditingAnggota ? '📝 Edit Profil Anggota' : '➕ Registrasi Anggota Baru'}
+							</h4>
+
+							<form
+								method="POST"
+								action="?/simpanAnggota"
+								use:enhance
+								class="space-y-3"
+								onsubmit={() => setTimeout(() => (isEditingAnggota = false), 500)}
+							>
+								<input type="hidden" name="isEdit" value={isEditingAnggota ? 'true' : 'false'} />
+
+								<div>
+									<label class="block text-xs font-semibold text-gray-500 mb-1"
+										>No. Anggota (Primary Key - Tidak Bisa Diubah)</label
+									>
+									<input
+										type="text"
+										name="noAnggota"
+										required
+										bind:value={editNoAnggota}
+										readonly={isEditingAnggota}
+										placeholder="Contoh: 2026001"
+										class="w-full p-2 border rounded-lg text-sm outline-none font-mono disabled:bg-gray-100 readonly:bg-gray-100 readonly:text-gray-400"
+									/>
+								</div>
+								<div>
+									<label class="block text-xs font-semibold text-gray-500 mb-1">Nama Lengkap</label>
+									<input
+										type="text"
+										name="namaLengkap"
+										required
+										bind:value={editNamaLengkap}
+										placeholder="Nama Lengkap"
+										class="w-full p-2 border rounded-lg text-sm outline-none"
+									/>
+								</div>
+								<div>
+									<label class="block text-xs font-semibold text-gray-500 mb-1">Kelas</label>
+									<input
+										type="text"
+										name="kelas"
+										required
+										bind:value={editKelas}
+										placeholder="Contoh: IF-3"
+										class="w-full p-2 border rounded-lg text-sm outline-none"
+									/>
+								</div>
+								<div>
+									<label class="block text-xs font-semibold text-gray-500 mb-1">No HP/WA</label>
+									<input
+										type="text"
+										name="noHp"
+										bind:value={editNoHp}
+										placeholder="08xxxxxxxx"
+										class="w-full p-2 border rounded-lg text-sm outline-none"
+									/>
+								</div>
+								<div>
+									<label class="block text-xs font-semibold text-gray-500 mb-1">Alamat</label>
+									<textarea
+										name="alamat"
+										bind:value={editAlamat}
+										placeholder="Alamat lengkap"
+										rows="2"
+										class="w-full p-2 border rounded-lg text-sm outline-none resize-none"
+									></textarea>
+								</div>
+
+								<div class="flex gap-2 pt-2">
+									{#if isEditingAnggota}
+										<button
+											type="button"
+											onclick={batalkanEditAnggota}
+											class="flex-1 bg-gray-200 text-gray-700 p-2 rounded-lg text-xs font-bold hover:bg-gray-300"
+											>BATAL</button
+										>
+									{/if}
+									<button
+										type="submit"
+										class="flex-1 bg-blue-600 text-white p-2 rounded-lg text-xs font-bold hover:bg-blue-700"
+									>
+										{isEditingAnggota ? 'PERBARUI DATA' : 'REGISTRASI'}
+									</button>
+								</div>
+							</form>
+						</div>
 					</div>
 				{/if}
 			</div>
