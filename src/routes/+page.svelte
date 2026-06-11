@@ -52,6 +52,12 @@
 	function handleLogin() {
 		if (usernameInput === data.adminUsername && passwordInput === data.adminPassword) {
 			isLoggedIn = true;
+
+			// === TAMBAHKAN INI: Kunci status login di browser admin ===
+			if (typeof window !== 'undefined') {
+				sessionStorage.setItem('isAdminLoggedIn', 'true');
+			}
+
 			notif.muncul = true;
 			notif.teks = '🔓 Login sukses! Selamat bekerja, Admin.';
 			notif.sukses = true;
@@ -74,6 +80,12 @@
 
 	function handleLogout() {
 		isLoggedIn = false;
+
+		// === TAMBAHKAN INI: Hapus kunci login saat admin keluar ===
+		if (typeof window !== 'undefined') {
+			sessionStorage.removeItem('isAdminLoggedIn');
+		}
+
 		usernameInput = '';
 		passwordInput = '';
 		activeTab = 'dashboard';
