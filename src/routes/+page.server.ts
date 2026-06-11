@@ -1,8 +1,9 @@
 import { fail } from '@sveltejs/kit';
 import { supabase } from '$lib/supabase';
+import { ADMIN_USERNAME, ADMIN_PASSWORD } from '$env/static/private';
 import type { PageServerLoad, Actions } from './$types';
 
-// 1. LOAD DATA DARI SUPABASE SAAT HALAMAN DIBUKA
+// 1. LOAD DATA DARI CLOUD SUPABASE & KREDENSIAL ENV
 export const load: PageServerLoad = async () => {
 	const { data: kategori } = await supabase.from('kategori').select('*');
 	const { data: buku } = await supabase.from('buku').select('*').order('id', { ascending: true });
@@ -19,28 +20,29 @@ export const load: PageServerLoad = async () => {
 		daftarKategori: kategori || [],
 		daftarBuku: buku || [],
 		daftarAnggota: anggota || [],
-		riwayatTransaksi: transaksi || []
+		riwayatTransaksi: transaksi || [],
+		adminUsername: ADMIN_USERNAME,
+		adminPassword: ADMIN_PASSWORD
 	};
 };
 
-// 2. SERVER ACTIONS (PENGGANTI LOGIKA UTAMA/MACRO KE DATABASE)
+// 2. SERVER ACTIONS (MANAJEMEN DATABASE)
 export const actions: Actions = {
 	tambahKategori: async ({ request }) => {
 		const data = await request.formData();
 		const nama = data.get('nama') as string;
 
-		// Ambil data untuk auto ID kategori (K01, K02...)
 		const { data: list } = await supabase.from('kategori').select('id');
 		const id = `K${String((list?.length || 0) + 1).padStart(2, '0')}`;
 
 		const { error } = await supabase.from('kategori').insert([{ id, nama }]);
-		if (error) return fail(400, { error: 'Gagal menambahkan kategori' });
-		return { success: 'Kategori berhasil ditambahkan!' };
+		if (error) return fail(400, { error: '❌ Gagal menambahkan kategori baru!' });
+		return { success: '✅ Kategori baru berhasil disimpan ke Cloud!' };
 	},
 
 	tambahBuku: async ({ request }) => {
 		const data = await request.formData();
-		const id = (data.get('id') as string).toUpperCase();
+		const id = (data.get('id') as string).toUpperCase().trim();
 		const judul = data.get('judul') as string;
 		const kategoriId = data.get('kategoriId') as string;
 		const stok = parseInt(data.get('stok') as string);
@@ -48,8 +50,9 @@ export const actions: Actions = {
 		const { error } = await supabase
 			.from('buku')
 			.insert([{ id, judul, kategori_id: kategoriId, stok, dipinjam: 0 }]);
-		if (error) return fail(400, { error: 'Gagal/Kode Buku sudah ada!' });
-		return { success: 'Buku berhasil dimasukkan!' };
+		if (error)
+			return fail(400, { error: '❌ Gagal! Kode Buku tersebut sudah terdaftar di sistem.' });
+		return { success: '✅ Buku baru dengan kode kustom berhasil katalogkan!' };
 	},
 
 	hapusBuku: async ({ request }) => {
@@ -57,13 +60,13 @@ export const actions: Actions = {
 		const id = data.get('id') as string;
 
 		const { error } = await supabase.from('buku').delete().eq('id', id);
-		if (error) return fail(400, { error: 'Gagal menghapus buku' });
-		return { success: 'Buku berhasil dihapus' };
+		if (error) return fail(400, { error: '❌ Gagal menghapus buku dari database.' });
+		return { success: '🗑️ Buku telah berhasil dihapus dari katalog cloud.' };
 	},
 
 	simpanAnggota: async ({ request }) => {
 		const data = await request.formData();
-		const no_anggota = (data.get('noAnggota') as string).toUpperCase();
+		const no_anggota = (data.get('noAnggota') as string).toUpperCase().trim();
 		const nama_lengkap = data.get('namaLengkap') as string;
 		const kelas = data.get('kelas') as string;
 		const no_hp = data.get('noHp') as string;
@@ -75,14 +78,15 @@ export const actions: Actions = {
 				.from('anggota')
 				.update({ nama_lengkap, kelas, no_hp, alamat })
 				.eq('no_anggota', no_anggota);
-			if (error) return fail(400, { error: 'Gagal memperbarui anggota' });
+			if (error) return fail(400, { error: '❌ Gagal memperbarui profil anggota.' });
+			return { success: '✅ Data profil anggota berhasil diperbarui!' };
 		} else {
 			const { error } = await supabase
 				.from('anggota')
 				.insert([{ no_anggota, nama_lengkap, kelas, no_hp, alamat }]);
-			if (error) return fail(400, { error: 'Gagal/Nomor Anggota sudah terdaftar!' });
+			if (error) return fail(400, { error: '❌ Gagal! Nomor Anggota tersebut sudah terdaftar.' });
+			return { success: '✅ Anggota baru berhasil terdaftar secara manual!' };
 		}
-		return { success: 'Data anggota berhasil disimpan' };
 	},
 
 	hapusAnggota: async ({ request }) => {
@@ -90,8 +94,8 @@ export const actions: Actions = {
 		const no_anggota = data.get('noAnggota') as string;
 
 		const { error } = await supabase.from('anggota').delete().eq('no_anggota', no_anggota);
-		if (error) return fail(400, { error: 'Gagal menghapus anggota' });
-		return { success: 'Anggota berhasil dihapus' };
+		if (error) return fail(400, { error: '❌ Gagal menghapus data anggota.' });
+		return { success: '🗑️ Anggota berhasil dihapus dari sistem.' };
 	},
 
 	eksekusiPeminjaman: async ({ request }) => {
@@ -100,7 +104,6 @@ export const actions: Actions = {
 		const kodeBuku = data.get('kodeBuku') as string;
 		const lamaPinjam = parseInt(data.get('lamaPinjam') as string);
 
-		// Ambil data nama anggota & judul buku
 		const { data: member } = await supabase
 			.from('anggota')
 			.select('nama_lengkap')
@@ -113,21 +116,20 @@ export const actions: Actions = {
 			.single();
 
 		if (!member || !book || book.stok <= 0)
-			return fail(400, { error: 'Validasi gagal/Stok habis!' });
+			return fail(400, { error: '❌ Validasi gagal atau stok buku sedang habis!' });
 
-		// Update stok buku di Supabase
+		// Kurangi stok di Cloud
 		await supabase
 			.from('buku')
 			.update({ stok: book.stok - 1, dipinjam: book.dipinjam + 1 })
 			.eq('id', kodeBuku);
 
-		// Hitung Tanggal
+		// Hitung batas tanggal
 		const hariIni = new Date();
 		const tglPinjamStr = hariIni.toISOString().split('T')[0];
 		hariIni.setDate(hariIni.getDate() + lamaPinjam);
 		const tglKembaliStr = hariIni.toISOString().split('T')[0];
 
-		// Buat ID Transaksi otomatis
 		const { data: listTrx } = await supabase.from('transaksi').select('id');
 		const idTrx = `T${String((listTrx?.length || 0) + 1).padStart(3, '0')}`;
 
@@ -144,7 +146,7 @@ export const actions: Actions = {
 			}
 		]);
 
-		return { success: 'Peminjaman berhasil dicatat!' };
+		return { success: '✅ Transaksi peminjaman baru berhasil dicatat!' };
 	},
 
 	kembalikanBuku: async ({ request }) => {
@@ -166,6 +168,6 @@ export const actions: Actions = {
 			}
 			await supabase.from('transaksi').update({ status: 'Kembali' }).eq('id', trxId);
 		}
-		return { success: 'Buku berhasil dikembalikan!' };
+		return { success: '✅ Buku telah dikembalikan ke rak, status diperbarui!' };
 	}
 };
